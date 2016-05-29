@@ -13,13 +13,13 @@ use Data::Dumper;
 ################################################################################
 # Parameters
 ################################################################################
-my $iterationnumber 	= 100; 							# number of iterations
-my $crossoverprob 		= 0.3; 								# crossover probability
-my $mutationprob 		= 0.012; 							# mutation probability
+my $iterationnumber 	= 100; 								# number of iterations
+my $crossoverprob 		= 0.1; 								# crossover probability
+my $mutationprob 		= 0.015; 							# mutation probability
 my $fitnesspow 			= 4.0; 								# pow value for fitness formula
-my $indnumber 			= 90; 								# number of individuals (solutions)
-my $holdoutval 			= 0.8; 								# percentage of inputs that will be used for cross validation
-my $infile 				= "./usd_brl_big_pocket0.1.txt"; 	# indicators results input file
+my $indnumber 			= 100; 								# number of individuals (solutions)
+my $holdoutval 			= 0.9; 								# percentage of inputs that will be used for cross validation
+my $infile 				= "./ggbr4_merit_38.txt"; 			# indicators results input file
 my $initconst 			= 0.4; 								# initialize: chance of bit=1
 my $avgenvelope 		= 0.25; 							# initialize: chance of bit=1
 ################################################################################
@@ -46,7 +46,7 @@ my @indINT;
 ################################################################################
 ################################################################################
 my $BRUTE_FORCE = 0;
-my $MAX_THREADS = 4;
+my $MAX_THREADS = 1;
 my $DEBUG_MODE = 0;
 my $MAX_SUBJECT_VALUE = 0; ## RESET AT INPUT FILE READING!!!
 ################################################################################
@@ -141,12 +141,12 @@ sub popresults {
 
 		# print join('', @fields),"|$realize|",scalar(@fields),"\n";
 
-		unless ($val) {
-			print scalar(scalar(@fields)),"|",$#fields,"\n";
-			print "\n";
-			print join('', @fields), "|",scalar(@fields),"|$val\n";
-			# exit(0);
-		}
+		# unless ($val) {
+		# 	print scalar(scalar(@fields)),"|",$#fields,"\n";
+		# 	print "\n";
+		# 	print join('', @fields), "|",scalar(@fields),"|$val\n";
+		# 	# exit(0);
+		# }
 
 		# @fields = @origFields;
 
@@ -326,8 +326,8 @@ sub initialize {
 	print ">>> Initializing individuals\n" if $DEBUG_MODE;
 	my $const = $initconst;
 	for my $indn (0..$indnumber-1){
-		$indINT[$indn][0] = int(rand() * $MAX_SUBJECT_VALUE);
-		#$indINT[$indn][0] = 0;
+		# $indINT[$indn][0] = int(rand() * $MAX_SUBJECT_VALUE);
+		$indINT[$indn][0] = 0;
 		#$indINT[$indn][0] = $MAX_SUBJECT_VALUE;
 		$indINT[$indn][$idxFitness] = 0;
 		$indINT[$indn][$idxFitnessAdj] = 0;
@@ -646,9 +646,13 @@ sub crossvalidation_merit {
 	my @arSubject = split('', $strSubject);
 	my %confusionTable;
 	my $confstrg = 0;
+	$confusionTable{'11'} = 0;
+	$confusionTable{'10'} = 0;
+	$confusionTable{'01'} = 0;
+	$confusionTable{'00'} = 0;
 	
 	# The Chosen One
-	printf "I%d # %s [%d] {%d}", $iteration, $strSubject, $intSubject, $fitSubject;
+	printf "I%-3d # %s [%14d] {%2d}", $iteration, $strSubject, $intSubject, $fitSubject;
 	# Calculating the sum of the columns of the best individual, ie., number of technical indicators chosen
 	$chosenindnum = usedindnum(-1);
 	printf " #i: %2d/%2d", $chosenindnum, $indsize;
